@@ -458,3 +458,82 @@ ggpubr::ggpar(ind.p,
               )
 ```
 
+BIPLOT
+
+Pour créer un biplot simple des individus et des variables, tapez ceci:
+
+```{r}
+fviz_pca_biplot(res.pca, repel = TRUE,
+                col.var = "#2E9FDF", # Couleur des variables
+                col.ind = "#696969"  # Couleur des individues
+                )
+```
+
+Notez que le biplot n’est utile que s’il existe un faible nombre de variables et d’individus dans le jeu de données; sinon le graphique final serait illisible.
+
+Notez également que les coordonnées des individus et des variables ne sont pas construites dans le même espace. Par conséquent, dans le biplot, vous devriez vous concentrer principalement sur la direction des variables mais pas sur leurs positions absolues sur le graphique.
+
+Globalement, un biplot peut être interprété comme suit:
+
+un individu qui se trouve du même côté d’une variable donnée a une valeur élevée pour cette variable;
+un individu qui se trouve sur le côté opposé d’une variable donnée a une faible valeur pour cette variable.
+
+Exemple iris :
+
+Maintenant, en utilisant le résultat iris.pca, nous allons:
+
+faire un biplot des individus et des variables
+changer la couleur des individus par groupes: col.ind = iris$Species
+afficher uniquement l’annotation des variables: label = "var" ou utilisez geom.ind = "point"
+
+```{r}
+fviz_pca_biplot (iris.pca,
+                col.ind = iris$Species, palette = "jco",
+                addEllipses = TRUE, label = "var",
+                col.var = "black", repel = TRUE,
+                legend.title = "Species")
+
+```
+
+Dans l’exemple suivant, nous voulons colorer les individus et les variables par groupes. L’astuce consiste à utiliser pointshape = 21 pour les points des individus. Cette forme de point particulière peut être remplie par une couleur en utilisant l’argument fill.ind. La couleur de la bordure des points des individus est définie en “black” en utilisant col.ind. Pour colorer les variables par groupes, l’argument col.var sera utilisé.
+
+Pour personnaliser les couleurs des individus et des variables, nous utilisons les fonctions helper fill_palette() et color_palette().
+
+```{r}
+fviz_pca_biplot(iris.pca, 
+                # Colueur de remplissage des individdus par groupes
+                geom.ind = "point",
+                pointshape = 21,
+                pointsize = 2.5,
+                fill.ind = iris$Species,
+                col.ind = "black",
+                # Colorer les variables par groupes
+                col.var = factor(c("sepal", "sepal", "petal", "petal")),
+                
+                legend.title = list(fill = "Species", color = "Clusters"),
+                repel = TRUE        # Evite le chévauchement du texte
+             )+
+  ggpubr::fill_palette("jco")+      # Couleur des individus
+  ggpubr::color_palette("npg")      # Couleur des variables
+```
+
+Un autre exemple complexe est de colorer les individus par groupes (couleurs discrètes) et les variables par leurs contributions aux composantes principales (gradient de couleurs). En plus, nous modifierons la transparence des variables par leurs contributions en utilisant l’argument alpha.var.
+
+```{r}
+fviz_pca_biplot(iris.pca, 
+                # Individus
+                geom.ind = "point",
+                fill.ind = iris$Species, col.ind = "black",
+                pointshape = 21, pointsize = 2,
+                palette = "jco",
+                addEllipses = TRUE,
+                # Variables
+                alpha.var ="contrib", col.var = "contrib",
+                gradient.cols = "RdYlBu",
+                
+                legend.title = list(fill = "Species", color = "Contrib",
+                                    alpha = "Contrib")
+                )
+```
+
+
