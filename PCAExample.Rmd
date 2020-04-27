@@ -544,7 +544,7 @@ Les variables et individus supplémentaires ne sont pas utilisés pour la déter
 
 Pour spécifier des individus et des variables supplémentaires, la fonction PCA() peut être utilisée comme suit
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 PCA(X, ind.sup = NULL, 
     quanti.sup = NULL, quali.sup = NULL, graph = TRUE)
 ```
@@ -661,3 +661,52 @@ fviz_pca_biplot (res.pca, select.ind = list (contrib = 5),
 ```
 
 (Lorsque la sélection se fait selon les valeurs de contribution, les individus / variables supplémentaires ne sont pas représentés parce qu’ils ne contribuent pas à la construction des axes).
+
+
+EXPORTATION DES RÉSULTATS
+
+Exporter les graphiques en PDF / PNG
+
+La première étape consiste à créer les graphiques que vous voulez en tant qu’objets R:
+
+```{r}
+# Scree plot
+scree.plot <- fviz_eig (res.pca)
+# Graphique des d'individus
+ind.plot <- fviz_pca_ind (res.pca)
+# Graphique des variables
+var.plot <- fviz_pca_var (res.pca)
+```
+
+Ensuite, les graphiques peuvent être exportés dans un seul fichier pdf comme suit:
+
+```{r}
+library (ggpubr)
+ggexport (plotlist = list(scree.plot, ind.plot, var.plot),
+         filename = "PCA.pdf")
+```
+
+Organiser et exporter. Spécifiez nrow et ncol pour afficher plusieurs graphiques sur la même page:
+
+```{r}
+ggexport (plotlist = list(scree.plot, ind.plot, var.plot),
+         nrow = 2, ncol = 2,
+         filename = "PCA.pdf")
+```
+
+Exporter des graphiques vers des fichiers png. Si vous spécifiez une liste de graphiques, plusieurs fichiers png seront automatiquement créés pour contenir chaque graphique.
+
+```{r}
+ggexport (plotlist = list(scree.plot, ind.plot, var.plot),
+         filename = "PCA.png")
+```
+
+Exporter les résultats vers les fichiers txt / csv
+
+```{r}
+# Exporter vers un fichier TXT
+write.infile (res.pca, "pca.txt", sep = "\t")
+# Exporter vers un fichier CSV
+write.infile (res.pca, "pca.csv", sep = ";")
+```
+
