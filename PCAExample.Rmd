@@ -618,10 +618,46 @@ p
 Les individus supplémentaires sont représentés en bleu. Les variables qualitatives supplémentaires sont indiquées en rouge.
 
 
+VARIABLES QUALITATIVES
 
+Les variables qualitatives supplémentaires sur les individus peuvent être ajoutées en utilisant fviz_add().
 
+Notez que les variables qualitatives supplémentaires peuvent également être utilisées pour colorer les individus par groupes. Cela peut aider à interpréter les données. Le jeu de données decathlon2 contient une variable qualitative supplémentaire dans la colonne 13 correspondant aux types de compétitions.
 
+Les résultats concernant la variable qualitative supplémentaire sont les suivants:
 
+```{r}
+res.pca$quali
+```
 
+Pour colorer les individus par une variable qualitative supplémentaire, l’argument habillage sert à spécifier la position de la variable qualitative supplémentaire.
 
+```{r}
+fviz_pca_ind(res.pca, habillage = 13,
+             addEllipses =TRUE, ellipse.type = "confidence",
+             palette = "jco", repel = TRUE) 
+```
 
+Si vous avez un nombre élevé d’individus / variables, il est possible de visualiser seulement certains d’entre eux en utilisant les arguments select.ind et select.var.
+
+select.ind, select.var: une sélection d’individus / variables à visualiser. Les valeurs autorisées sont NULL ou une list contenant le nom des arguments, cos2 ou contrib:
+
+name: est un vecteur de caractères contenant les noms des individus / variables à visualiser
+cos2: si cos2 est dans [0, 1], ex: 0.6, alors les individus / variables avec un cos2> 0.6 sont montrés. si cos2> 1, ex: 5, les top 5 individus / variables actifs ainsi que les top 5 individus/ variables supplémentaires avec le cos2 le plus élevé sont montrés
+contrib: si contrib> 1, ex: 5, alors les top 5 individus / variables avec les contributions les plus importantes sont montrés
+
+```{r}
+# Visualiser les variables avec cos2> = 0.6
+fviz_pca_var (res.pca, select.var = list(cos2 = 0.6))
+# Top 5 variables actives avec le cos2 le plus elevé
+fviz_pca_var (res.pca, select.var = list(cos2 = 5))
+# Sélectionnez par noms
+name <- list (name = c ("Long.jump", "High.jump", "X100m"))
+fviz_pca_var (res.pca, select.var = name)
+# Top 5 des individus/variables les plus contibutifs
+fviz_pca_biplot (res.pca, select.ind = list (contrib = 5),
+               select.var = list (contrib = 5),
+               ggtheme = theme_minimal())
+```
+
+(Lorsque la sélection se fait selon les valeurs de contribution, les individus / variables supplémentaires ne sont pas représentés parce qu’ils ne contribuent pas à la construction des axes).
