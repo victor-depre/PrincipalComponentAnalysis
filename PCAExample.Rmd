@@ -1,0 +1,101 @@
+---
+title: "PCAExample"
+author: "Victor"
+date: "26/04/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library("FactoMineR")
+library("factoextra")
+```
+
+```{r}
+data(decathlon2) #decathlon2 fait partie du package factoextra, c'est un tableau de performances sportives lors d'une compétition. 
+
+decathlon2.active <- decathlon2[1:23, 1:10]
+head(decathlon2.active[, 1:6], 4) #on a maintenant un tableau 4x7 (4 athlètes, 6 variables)
+```
+
+Standardisation : l'objectif est de rendre les variables comparables pour obtenir des données centrées réduites (en général écart-type = 0 / moyenne = 1) > variable = (ancienne variable - variable moyenne)/écart-type
+
+La fonction PCA() de FactoMineR normalise les données automatiquement
+
+PCA(X, scale.unit = TRUE, ncp = 5, graph = TRUE)
+
+X: jeu de données de type data frame. Les lignes sont des individus et les colonnes sont des variables numériques.
+
+scale.unit: une valeur logique. Si TRUE, les données sont standardisées/normalisées avant l’analyse.
+
+ncp: nombre de dimensions conservées dans les résultats finaux.
+
+graph: une valeur logique. Si TRUE un graphique est affiché.
+
+```{r}
+res.pca <- PCA(decathlon2.active, graph = FALSE) #résultats du PCA
+print(res.pca) #différentes informations disponnibles
+```
+
+get_eigenvalue(res.pca): Extraction des valeurs propres / variances des composantes principales
+
+fviz_eig(res.pca): Visualisation des valeurs propres
+
+get_pca_ind(res.pca), get_pca_var(res.pca): Extraction des résultats pour les individus et les variables, respectivement.
+
+fviz_pca_ind(res.pca), fviz_pca_var(res.pca): visualisez les résultats des individus et des variables, respectivement.
+
+fviz_pca_biplot(res.pca): Création d’un biplot des individus et des variables.
+
+```{r}
+eig.val <- get_eigenvalue(res.pca) #obtenir les valeurs propres pour chaque dimension
+eig.val
+```
+
+Les valeurs propres mesurent la quantité de variance expliquée par chaque axe principal. Les valeurs propres sont grandes pour les premiers axes et petits pour les axes suivants. Autrement dit, les premiers axes correspondent aux directions portant la quantité maximale de variation contenue dans le jeu de données.
+
+Les valeurs propres doivent être examinées pour déterminer le nombre de composantes principales à prendre en considération.
+
+Par exemple ici les trois premières variables expliquent à elles seules plus de 70% de la variance, elles seront donc conservées. À noter que l'ont peut aussi choisir de conserver les 5 premières variables qui elles expliqueraient 87% de la variance.
+
+Autre moyen de déterminer quelles variables choisir
+
+```{r}
+fviz_eig(res.pca, addlabels = TRUE, ylim = c(0, 50)) #graphique des valeurs propres (on pourrait choisir les 5 premières variables car les tailles des batons 6, 7 etc. sont petites comparées aux autres et de tailles à peu près équivalentes)
+```
+
+EXTRAIRE LES RÉSULTATS
+
+Une méthode simple pour extraire les résultats, pour les variables, à partir de l’ACP est d’utiliser la fonction get_pca_var(). Cette fonction retourne une liste d’éléments contenant tous les résultats pour les variables actives (coordonnées, corrélation entre variables et les axes, cosinus-carré et contributions).
+
+```{r}
+var <- get_pca_var(res.pca)
+var
+```
+
+var$coord: coordonnées des variables pour créer un nuage de points.
+
+var$cos2: cosinus carré des variables. Représente la qualité de représentation des variables sur le graphique de la PCA. Il est calculé comme étant les coordonnées au carré: var.cos2 = var.coord * var.coord
+
+var$contrib: contient les contributions (en pourcentage), des variables, aux composantes principales. La contribution d’une variable (var) à une composante principale donnée: (var.cos2 * 100) / (total cos2 du composant)
+
+```{r}
+head(var$coord) # Coordonnées
+
+head(var$cos2) # Cos2: qualité de répresentation
+
+head(var$contrib) # Contributions aux composantes principales
+```
+
+VISUALISER LES VARIABLES
+
+CERCLE DE CORRELATION
+
+```{r}
+head(var$coord, 4) # Variables
+fviz_pca_var(res.pca, col.var = "black") # Cercle de corrélation
+```
+
