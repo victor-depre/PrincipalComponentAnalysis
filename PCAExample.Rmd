@@ -340,7 +340,7 @@ fviz_pca_var(res.pca, axes = c(2, 3))
 fviz_pca_ind(res.pca, axes = c(2, 3))
 ```
 
-ÉLEMENTS GRAPHIQUES : point, texte, flèche
+ÉLÉMENTS GRAPHIQUES : point, texte, flèche
 
 L’argument geom et les dérivées sont utilisés pour spécifier les éléments géométriques ou les éléments graphiques à utiliser.
 
@@ -535,5 +535,93 @@ fviz_pca_biplot(iris.pca,
                                     alpha = "Contrib")
                 )
 ```
+
+ÉLÉMENTS SUPPLÉMENTAIRES
+
+Le jeu de données decathlon2 contient des variables continues supplémentaires (quanti.sup, colonnes 11:12), des variables qualitatives supplémentaires (quali.sup, colonne 13) et des individus supplémentaires (ind.sup, lignes 24:27).
+
+Les variables et individus supplémentaires ne sont pas utilisés pour la détermination des composantes principales. Leurs coordonnées sont prédites en utilisant uniquement les informations fournies par l’analyse en composantes principales effectuée sur les variables/individus actifs.
+
+Pour spécifier des individus et des variables supplémentaires, la fonction PCA() peut être utilisée comme suit
+
+```{r}
+PCA(X, ind.sup = NULL, 
+    quanti.sup = NULL, quali.sup = NULL, graph = TRUE)
+```
+
+X: un data frame. Les lignes sont des individus et les colonnes sont des variables numériques.
+ind.sup: un vecteur numérique spécifiant les positions des individus supplémentaires
+quanti.sup, quali.sup: un vecteur numérique spécifiant, respectivement, les positions des variables quantitatives et qualitatives
+graph: une valeur logique. Si TRUE, un graphique est affiché.
+
+Par exemple : 
+
+```{r}
+res.pca <- PCA(decathlon2, ind.sup = 24:27, 
+               quanti.sup = 11:12, quali.sup = 13, graph=FALSE)
+```
+
+VARIABLES QUANTITATIVES
+
+Résultats prédites (coordonnées, corrélation et cos2) pour les variables quantitatives supplémentaires:
+
+```{r}
+res.pca$quanti.sup
+```
+
+Visualiser toutes les variables (actives et complémentaires):
+
+```{r}
+fviz_pca_var(res.pca)
+```
+
+Notez que, par défaut, les variables quantitatives supplémentaires sont indiquées en couleur bleue et en pointillé.
+
+```{r}
+# Changer la couleur des variables
+fviz_pca_var(res.pca,
+             col.var = "black", # Variables actives
+             col.quanti = "red" # variables quantitatives supl.
+             )
+# Cacher les variables actives sur le graphique,
+# ne montrent que des variables supplémentaires
+fviz_pca_var(res.pca, invisible = "var")
+# Cacher les variables supplémentaires
+fviz_pca_var(res.pca, invisible = "quanti.sup")
+```
+
+En utilisant fviz_pca_var(), les variables supplémentaires quantitatives sont affichées automatiquement sur le graphique du cercle de corrélation. Notez que vous pouvez ajouter les variables quanti.sup manuellement, en utilisant la fonction fviz_add(), pour plus de personnalisation. Un exemple est illustré ci-dessous.
+
+```{r}
+# Graphique des variables actives
+p <- fviz_pca_var(res.pca, invisible = "quanti.sup")
+# Ajouter des variables actives supplémentaires
+fviz_add(p, res.pca$quanti.sup$coord, 
+         geom = c("arrow", "text"), 
+         color = "red")
+```
+
+Résultats prédites pour les individus supplémentaires:
+
+```{r}
+res.pca$ind.sup
+```
+
+Visualiser tous les individus (actifs et supplémentaires). Sur le graphique, vous pouvez ajouter aussi les variables qualitatives supplémentaires (quali.sup), dont les coordonnées sont accessibles à l’aide de la fonction res.pca\$quali.supp\$coord.
+
+```{r}
+p <- fviz_pca_ind(res.pca, col.ind.sup = "blue", repel = TRUE)
+p <- fviz_add(p, res.pca$quali.sup$coord, color = "red")
+p
+```
+
+Les individus supplémentaires sont représentés en bleu. Les variables qualitatives supplémentaires sont indiquées en rouge.
+
+
+
+
+
+
+
 
 
